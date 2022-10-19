@@ -9,8 +9,8 @@ import org.json.JSONObject;
 
 public class Challenge {
 
-    static final String CANDIDATE_ID = "e5f30ed6-c59e-47d9-9d4e-3cdf9da10a65" ;
-    static final String API_PATH = "https://challenge.crossmint.io/api/" ;
+    static final String CANDIDATE_ID = "e5f30ed6-c59e-47d9-9d4e-3cdf9da10a65";
+    static final String API_PATH = "https://challenge.crossmint.io/api/";
     static final int RETRY_DELAY_MS = 1000;
     static final int HTTP_TOO_MANY_REQUESTS_CODE = 429;
 
@@ -26,11 +26,15 @@ public class Challenge {
                 String currentElement = jsonArrayRow.getString(currentCol);
                 if (currentElement.equals(POLYANET_CONST)) {
                     createPolyanets(currentRow, currentCol);
-                } else if (currentElement.length() > 6 && currentElement.substring(currentElement.length() - SOLOON_CONST.length()).equals(SOLOON_CONST)) {
-                    String color = currentElement.substring(0, currentElement.length() - (SOLOON_CONST.length() +1)).toLowerCase();
+                } else if (currentElement.length() > SOLOON_CONST.length() && currentElement
+                        .substring(currentElement.length() - SOLOON_CONST.length()).equals(SOLOON_CONST)) {
+                    String color = currentElement.substring(0, currentElement.length() - (SOLOON_CONST.length() + 1))
+                            .toLowerCase();
                     createSoloons(currentRow, currentCol, color);
-                } else if (currentElement.length() > 6 && currentElement.substring(currentElement.length() - COMETH_CONST.length()).equals(COMETH_CONST)) {
-                    String direction = currentElement.substring(0, currentElement.length() - (COMETH_CONST.length() + 1)).toLowerCase();
+                } else if (currentElement.length() > COMETH_CONST.length() && currentElement
+                        .substring(currentElement.length() - COMETH_CONST.length()).equals(COMETH_CONST)) {
+                    String direction = currentElement
+                            .substring(0, currentElement.length() - (COMETH_CONST.length() + 1)).toLowerCase();
                     createCometh(currentRow, currentCol, direction);
                 }
             }
@@ -39,11 +43,11 @@ public class Challenge {
 
     private static void createPolyanets(int row, int column) {
         String argumentsString = new JSONObject()
-                  .put("row", row)
-                  .put("column", column)
-                  .put("candidateId", CANDIDATE_ID)
-                  .toString();
-            
+                .put("row", row)
+                .put("column", column)
+                .put("candidateId", CANDIDATE_ID)
+                .toString();
+
         createObject("polyanets", argumentsString);
     }
 
@@ -54,7 +58,7 @@ public class Challenge {
                 .put("color", color)
                 .put("candidateId", CANDIDATE_ID)
                 .toString();
-  
+
         createObject("soloons", argumentsString);
     }
 
@@ -72,16 +76,16 @@ public class Challenge {
 
     private static JSONArray getChallenge() {
         StringBuffer response = doHTTPRequest("map/" + CANDIDATE_ID + "/goal", "GET", null, 0);
-        //Show the output
-        JSONObject temp1 = new JSONObject(response.toString());
-        return temp1.getJSONArray("goal");
+        JSONObject jsonObject = new JSONObject(response.toString());
+        return jsonObject.getJSONArray("goal");
     }
 
     private static void createObject(String pathSuffix, String argumentsString) {
         doHTTPRequest(API_PATH + pathSuffix, "POST", null, 0);
     }
 
-    private static StringBuffer doHTTPRequest(String pathSuffix, String requestType, String argumentsString, int waitSeconds) {
+    private static StringBuffer doHTTPRequest(String pathSuffix, String requestType, String argumentsString,
+            int waitSeconds) {
         try {
             URL url = new URL(API_PATH + pathSuffix);
             HttpURLConnection myConn = (HttpURLConnection) url.openConnection();
@@ -109,7 +113,7 @@ public class Challenge {
                 in.close();
                 return response;
             } else if (responseCode == HTTP_TOO_MANY_REQUESTS_CODE) {
-                waitSeconds+= RETRY_DELAY_MS;
+                waitSeconds += RETRY_DELAY_MS;
                 Thread.sleep(waitSeconds);
                 return doHTTPRequest(pathSuffix, requestType, argumentsString, waitSeconds);
             } else {
